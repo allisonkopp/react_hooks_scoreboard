@@ -5,27 +5,28 @@ const Stopwatch = _ => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [previousTime, setPreviousTime] = useState(0);
 
-  useEffect(_ => {
-    const intervalId = setInterval(_ => tick(), 100);
-    return _ => clearInterval(intervalId);
-  }, []);
-
   const tick = _ => {
-    if (isRunning) {
-      const now = Date.now();
-      setPreviousTime(now);
-      setElapsedTime(prevState => prevState.elapsedTime + (now - previousTime));
-    }
+    if (!isRunning) return;
+    const now = Date.now();
+    setPreviousTime(now);
+    setElapsedTime(prevElapsedTime => prevElapsedTime + (now - previousTime));
   };
 
+  useEffect(
+    _ => {
+      const intervalId = setInterval(tick, 100);
+      return _ => clearInterval(intervalId);
+    },
+    [tick] //passed as the dependency
+  );
+
   const handleStopwatch = _ => {
-    setIsRunning(prevState => !prevState.isRunning);
     if (!isRunning) setPreviousTime(Date.now());
+    setIsRunning(prevState => !prevState.isRunning);
   };
 
   const handleReset = _ => setElapsedTime(0);
 
-  console.log(elapsedTime);
   const seconds = Math.floor(elapsedTime / 1000);
 
   return (
