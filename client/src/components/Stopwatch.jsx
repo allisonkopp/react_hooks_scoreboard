@@ -6,7 +6,7 @@ const Stopwatch = _ => {
   const [previousTime, setPreviousTime] = useState(0);
 
   useEffect(_ => {
-    const intervalId = setInterval(tick, 100);
+    const intervalId = setInterval(_ => tick(), 100);
     return _ => clearInterval(intervalId);
   }, []);
 
@@ -14,18 +14,20 @@ const Stopwatch = _ => {
     if (isRunning) {
       const now = Date.now();
       setPreviousTime(now);
-      setElapsedTime(elapsedTime + (now - previousTime));
+      setElapsedTime(prevState => prevState.elapsedTime + (now - previousTime));
     }
   };
 
   const handleStopwatch = _ => {
-    setIsRunning(prevState => ({ isRunning: !prevState.isRunning }));
+    setIsRunning(prevState => !prevState.isRunning);
     if (!isRunning) setPreviousTime(Date.now());
   };
 
   const handleReset = _ => setElapsedTime(0);
 
+  console.log(elapsedTime);
   const seconds = Math.floor(elapsedTime / 1000);
+
   return (
     <div className="stopwatch">
       <h2>Stopwatch</h2>

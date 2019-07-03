@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-const Form = _ => {
+const Form = ({ addPlayer }) => {
   const [name, setName] = useState(String());
   const [age, setAge] = useState(String());
 
   const handleSubmit = e => {
     e.preventDefault();
     const newPlayer = { name, age };
-    this.props.addPlayer(newPlayer);
+    addPlayer(newPlayer);
     setName(String());
     setAge(String());
   };

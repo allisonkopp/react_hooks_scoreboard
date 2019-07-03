@@ -1,0 +1,24 @@
+ handleInputChange = field => e => this.setState({ [field]: e.target.value });
+
+//METHOD 1 - simplest example
+
+  const [name, setName] = useState(String())
+  const [age, setAge] = useState(String())
+  const handleInputChange = field => e => ({
+    name: setName,
+    age: setAge,
+  }[field](e.target.value))
+
+
+//METHOD 2  - This is essentially replicating what this.setState() does in a class component
+
+  const [state, setState] = useState({ name: String(), age: String() })
+  const handleInputChange = field => e => setState(state => ({ ...state, [field]: e.target.value }))
+
+
+//METHOD 3 - This is the most ideal method when you have a lot of complicated state logic, would be overkill for this example tho (personally my favorite)
+
+  const INITIAL_STATE = { name: String(), age: String() }
+  const playerReducer = (state, payload) => ({ ...state, ...payload })
+  const [state, setState] = useReducer(playerReducer, INITIAL_STATE)
+  const handleInputChange = field => e => setState({ [field]: e.target.value })

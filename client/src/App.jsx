@@ -12,24 +12,18 @@ const App = _ => {
 
   const fetchPlayers = async _ => {
     const { data } = await axios.get('/characters');
-    const playersArray = players;
-    data.results.forEach(({ name }, i) => {
-      const parsedPlayer = {
-        id: playersArray.length,
-        name,
-        age: Math.ceil(Math.random() * 18),
-        score: Math.ceil(Math.random() * 10)
-      };
-      playersArray.push(parsedPlayer);
-    });
-    return playersArray;
+    const parsedPlayers = data.results.map(({ name }) => ({
+      id: Math.ceil(Math.random() * 1000000),
+      name,
+      age: Math.ceil(Math.random() * 18),
+      score: Math.ceil(Math.random() * 10)
+    }));
+    setPlayers([...players, ...parsedPlayers]);
   };
 
   useEffect(_ => {
-    const playersArray = fetchPlayers();
-    setPlayers(playersArray);
-  }, []);
-  //Second argument needs to be an empty array for useEffect to act as componentDidMount
+    fetchPlayers();
+  }, []); //Second argument needs to be an empty array for useEffect to act as componentDidMount
 
   const addPlayer = ({ name, age }) => {
     const newPlayer = {
