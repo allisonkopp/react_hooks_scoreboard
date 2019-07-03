@@ -22,7 +22,7 @@ const Stopwatch = _ => {
 
   const handleStopwatch = _ => {
     if (!isRunning) setPreviousTime(Date.now());
-    setIsRunning(prevState => !prevState.isRunning);
+    setIsRunning(prevIsRunning => !prevIsRunning);
   };
 
   const handleReset = _ => setElapsedTime(0);
