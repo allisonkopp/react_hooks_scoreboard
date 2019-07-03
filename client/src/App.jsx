@@ -1,17 +1,17 @@
-import React, { Component } from "react";
-import axios from "axios";
-import { data } from "./data";
-import Header from "./components/Header";
-import Players from "./components/Players";
-import Form from "./components/Form";
-import PlayerDetail from "./components/PlayerDetail";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { data } from './data';
+import Header from './components/Header';
+import Players from './components/Players';
+import Form from './components/Form';
+import PlayerDetail from './components/PlayerDetail';
 
-class App extends Component {
-  state = { players: data, selectedPlayerIndex: -1 };
+const App = _ => {
+  const [players, setPlayers] = useState(data);
+  const [selectedPlayerIndex, setSelectedPlayerIndex] = useState(-1);
 
-  async componentDidMount() {
-    const { data } = await axios.get("/characters");
-    const { players } = this.state;
+  const fetchPlayers = async _ => {
+    const { data } = await axios.get('/characters');
     const playersArray = players;
     data.results.forEach(({ name }, i) => {
       const parsedPlayer = {
@@ -22,10 +22,16 @@ class App extends Component {
       };
       playersArray.push(parsedPlayer);
     });
-    this.setState({ players: playersArray });
-  }
-  addPlayer = ({ name, age }) => {
-    const { players } = this.state;
+    return playersArray;
+  };
+
+  useEffect(_ => {
+    const playersArray = fetchPlayers();
+    setPlayers(playersArray);
+  }, []);
+  //Second argument needs to be an empty array for useEffect to act as componentDidMount
+
+  const addPlayer = ({ name, age }) => {
     const newPlayer = {
       id: players.length,
       name,
@@ -33,54 +39,48 @@ class App extends Component {
       score: 0
     };
     const newPlayerList = [newPlayer, ...players];
-    this.setState({ players: newPlayerList });
+    setPlayers(newPlayerList);
   };
 
-  removePlayer = id => {
-    const { players } = this.state;
-    const filteredPlayerList = players.filter(player => player.id !== id);
-    this.setState({ players: filteredPlayerList });
+  const removePlayer = id => {
+    const filteredPlayerList = players.length && players.filter(player => player.id !== id);
+    setPlayers(filteredPlayerList);
   };
 
-  selectPlayer = id => this.setState({ selectedPlayerIndex: id });
+  const selectPlayer = id => setSelectedPlayerIndex(id);
 
-  updatePlayerScore = (id, change) => {
-    const { players } = this.state;
-    const updatedPlayerList = players.map(player =>
-      player.id === id ? { ...player, score: (player.score += change) } : player
-    );
-    this.setState({ players: updatedPlayerList });
+  const updatePlayerScore = (id, change) => {
+    const updatedPlayerList =
+      players.length &&
+      players.map(player => (player.id === id ? { ...player, score: (player.score += change) } : player));
+    setPlayers(updatedPlayerList);
   };
 
-  getHighScore = _ => {
-    const { players } = this.state;
-    const scores = players.map(player => player.score);
-    const highScore = Math.max(...scores);
+  const getHighScore = _ => {
+    const scores = players.length && players.map(player => player.score);
+    const highScore = scores && Math.max(...scores);
     if (highScore) return highScore;
   };
 
-  render() {
-    const { players, selectedPlayerIndex } = this.state;
-    const highScore = this.getHighScore();
-    const playerCount = players.length;
-    const totalPoints = players.reduce((acc, player) => acc + player.score, 0);
-    const selectedPlayer =
-      selectedPlayerIndex !== -1 && players[selectedPlayerIndex];
-    return (
-      <div className="scoreboard">
-        <Header totalPoints={totalPoints} playerCount={playerCount} />
-        <Players
-          players={players}
-          removePlayer={this.removePlayer}
-          updatePlayerScore={this.updatePlayerScore}
-          selectPlayer={this.selectPlayer}
-          highScore={highScore}
-        />
-        <Form addPlayer={this.addPlayer} />
-        <PlayerDetail selectedPlayer={selectedPlayer} />
-      </div>
-    );
-  }
-}
+  const highScore = getHighScore();
+  const playerCount = players.length;
+  const totalPoints = players.length && players.reduce((acc, player) => acc + player.score, 0);
+  const selectedPlayer = selectedPlayerIndex !== -1 && players[selectedPlayerIndex];
+
+  return (
+    <div className="scoreboard">
+      <Header totalPoints={totalPoints} playerCount={playerCount} />
+      <Players
+        players={players}
+        removePlayer={removePlayer}
+        updatePlayerScore={updatePlayerScore}
+        selectPlayer={selectPlayer}
+        highScore={highScore}
+      />
+      <Form addPlayer={addPlayer} />
+      <PlayerDetail selectedPlayer={selectedPlayer} />
+    </div>
+  );
+};
 
 export default App;
